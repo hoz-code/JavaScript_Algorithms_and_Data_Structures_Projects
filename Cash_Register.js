@@ -4,18 +4,12 @@ function round(value, decimals) {
 
 function checkCashRegister(price, cash, cid) {
   let resultchangearr = []
-  console.log(price + "<------- price")
   let change = cash - price;
   let auxchange = change
-  console.log(cash + "<------- cash")
-  console.log(change + "<------- change")
   let cidmoney = (cid.reduce((prev, curr) => prev + curr[1], 0)).toFixed(2)
-  console.log(cidmoney + "<------- cash-in-drawer")
   if (cidmoney < change) {
     return { status: "INSUFFICIENT_FUNDS", change: [] }
   }
-
-
 
   cid.map(a => {
     switch (a[0]) {
@@ -54,7 +48,7 @@ function checkCashRegister(price, cash, cid) {
         if (money[1] < change) {
           change = change - money[1]
           change = round(change, 2)
-          
+
           resultchangearr.push(money.slice(0, 2))
         } else {
           resultchangearr.push([money[0], (Math.trunc(change / money[2])) * (money[2])])
@@ -64,20 +58,26 @@ function checkCashRegister(price, cash, cid) {
       }
     }
   })
-  if (change != 0){
-    return {status: "INSUFFICIENT_FUNDS", change: []}
+  if (change != 0) {
+    return { status: "INSUFFICIENT_FUNDS", change: [] }
   }
-  if (auxchange == cidmoney){
-    return {status: "CLOSED", change: cid}
+  if (auxchange == cidmoney) {
+    let cidequal = cid.map(m => {
+      return m.slice(0,2)
+    })
+    return { status: "CLOSED", change: cidequal.reverse() }
   }
 
-  
-  return {status: "OPEN", change: resultchangearr}
+
+  return { status: "OPEN", change: resultchangearr }
 }
 
 console.log(
 
 
-checkCashRegister(19.5, 20, [["PENNY", 0.5], ["NICKEL", 0], ["DIME", 0], ["QUARTER", 0], ["ONE", 0], ["FIVE", 0], ["TEN", 0], ["TWENTY", 0], ["ONE HUNDRED", 0]])
+  checkCashRegister(19.5, 20, [["PENNY", 0.5], ["NICKEL", 0], ["DIME", 0], ["QUARTER", 0], ["ONE", 0], ["FIVE", 0], ["TEN", 0], ["TWENTY", 0], ["ONE HUNDRED", 0]])
+
+
+
 
 )
