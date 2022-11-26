@@ -1,44 +1,83 @@
+function round(value, decimals) {
+  return Number(Math.round(value + 'e' + decimals) + 'e-' + decimals);
+}
+
 function checkCashRegister(price, cash, cid) {
-    console.log(price +"<------- price")
-    let change = cash - price;
-    console.log(change +"<------- change")
-    let cidmoney = (cid.reduce((prev, curr)=> prev + curr[1], 0)).toFixed(2)
-    console.log(cidmoney+"<------- cash-in-drawer")
-    let revertcid = cid.slice(0).reverse()
-
-    let newrevertcid = revertcid.map(x => {
-      if (x[1] > change){
-        console.log(x[1])
-      }else{
-        return revertcid[3]
-      }
-      
-      })
-
-    console.log(newrevertcid)
-  
+  let resultchangearr = []
+  console.log(price + "<------- price")
+  let change = cash - price;
+  let auxchange = change
+  console.log(cash + "<------- cash")
+  console.log(change + "<------- change")
+  let cidmoney = (cid.reduce((prev, curr) => prev + curr[1], 0)).toFixed(2)
+  console.log(cidmoney + "<------- cash-in-drawer")
+  if (cidmoney < change) {
+    return { status: "INSUFFICIENT_FUNDS", change: [] }
   }
+
+
+
+  cid.map(a => {
+    switch (a[0]) {
+      case "PENNY":
+        a.push(0.01)
+        break;
+      case "NICKEL":
+        a.push(0.05)
+        break;
+      case "DIME":
+        a.push(0.1)
+        break;
+      case "QUARTER":
+        a.push(0.25)
+        break;
+      case "ONE":
+        a.push(1)
+        break;
+      case "FIVE":
+        a.push(5)
+        break;
+      case "TEN":
+        a.push(10)
+        break;
+      case "TWENTY":
+        a.push(20)
+        break;
+      case "ONE HUNDRED":
+        a.push(100)
+        break;
+    }
+  }) //finish map whom include currency to cid
+  cid.reverse().forEach(money => {
+    if (!(money[2] > change)) {
+      if (money[1] != 0) {
+        if (money[1] < change) {
+          change = change - money[1]
+          change = round(change, 2)
+          
+          resultchangearr.push(money.slice(0, 2))
+        } else {
+          resultchangearr.push([money[0], (Math.trunc(change / money[2])) * (money[2])])
+          change = change - ((Math.trunc(change / money[2])) * (money[2]))
+          change = round(change, 2)
+        }
+      }
+    }
+  })
+  if (change != 0){
+    return {status: "INSUFFICIENT_FUNDS", change: []}
+  }
+  if (auxchange == cidmoney){
+    return {status: "CLOSED", change: cid}
+  }
+
   
-  checkCashRegister(3.26, 100, 
-  [["PENNY", 1.01], 
-  ["NICKEL", 2.05], 
-  ["DIME", 3.1], 
-  ["QUARTER", 4.25], 
-  ["ONE", 90], 
-  ["FIVE", 55], 
-  ["TEN", 20], 
-  ["TWENTY", 60], 
-  ["ONE HUNDRED", 100]])
-  
-  
-  /*
-    let denominationarray = [0.01,0.05,0.1,0.25,1,5,10,20,100];
-    let unitchange = denominationarray.map(currency => change/currency)
-    console.log(unitchange)
-    let denominationarrayindex = -1
-    let unitcid = cid.map(cid => {
-      denominationarrayindex = denominationarrayindex + 1;
-      return Math.round(cid[1]/denominationarray[denominationarrayindex]);
-      })
-    console.log(unitcid)
-   */
+  return {status: "OPEN", change: resultchangearr}
+}
+
+console.log(
+
+
+checkCashRegister(19.5, 20, [["PENNY", 0.5], ["NICKEL", 0], ["DIME", 0], ["QUARTER", 0], ["ONE", 0], ["FIVE", 0], ["TEN", 0], ["TWENTY", 0], ["ONE HUNDRED", 0]])
+
+)
